@@ -58,4 +58,10 @@ dependencies {
 
     //Glide : for displaying images
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    //Picasso : again for images
+    implementation ("com.squareup.picasso:picasso:2.8")
+
+    //Flexbox implementation
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
 }

@@ -13,6 +13,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.moviesrecommendersystem.databinding.ActivityMainBinding
 import com.example.moviesrecommendersystem.databinding.SublistMovieBinding
@@ -25,6 +27,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
 
     private var movieList : ArrayList<Movie> = arrayListOf()
+
+    private lateinit var recyclerView: RecyclerView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,42 +62,56 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<MovieList?>, response: Response<MovieList?>) {
                 progressDialog.dismiss()
 
-//                binding.movieTitle.text = response.body()?.original_title
-//                binding.movieDescription.text = response.body()?.overview
-//
-//                var posterUrl = "https://image.tmdb.org/t/p/w500${response.body()?.poster_path}"
-//                Glide.with(this@MainActivity).load(posterUrl).into(binding.posterImage);
                 if (response.isSuccessful)movieList = response.body()?.results ?: arrayListOf()
 
-                val listView = findViewById<GridView>(R.id.movieListView)
-                listView.adapter = MovieListAdapter(this@MainActivity, movieList)
+//                val listView = findViewById<GridView>(R.id.movieListView)
+//                listView.adapter = MovieListAdapter(this@MainActivity, movieList)
 
-                listView.setOnItemClickListener(){ parent, view, position, id ->
-                    val movie = parent.adapter.getItem(position) as Movie
-//                    Toast.makeText(this@MainActivity, movie.original_title, Toast.LENGTH_SHORT).show()
-//                    Toast.makeText(this@MainActivity, movie.overview, Toast.LENGTH_SHORT).show()
-//                    Toast.makeText(this@MainActivity, movie.poster_path, Toast.LENGTH_SHORT).show()
+                recyclerView = findViewById(R.id.recyclerView)
 
-//                    lateinit var binding2 : MovieListBinding
-//                    binding2.movieTitle.text = movie.original_title
-//                    binding2.movieDescription.text = movie.overview
+                recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+                recyclerView.setHasFixedSize(true)
 
-                    intent = Intent(this@MainActivity, MoviesActivity::class.java)
-                    intent.putExtra("title", movie.original_title)
-                    intent.putExtra("overview", movie.overview)
-                    intent.putExtra("posterpath", movie.poster_path)
-                    intent.putExtra("releaseDate", movie.release_date)
-                    intent.putExtra("runtime", movie.runtime.toString())
+                val adapter = MovieListAdapter(movieList)
+                recyclerView.adapter = adapter
 
-//                    if(movie.production_companies!=null)Toast.makeText(this@MainActivity, movie.production_companies.size, Toast.LENGTH_SHORT).show()
+                adapter.setOnClickListener(object :
+                    MovieListAdapter.OnClickListener {
+                    override fun onClick(position: Int, movie: Movie) {
+                        val intent = Intent(this@MainActivity, MoviesActivity::class.java)
 
-                    val solution = Math.round(movie.vote_average * 10.0) / 10.0
-                    intent.putExtra("rating", solution.toString())
-                    intent.putExtra("tagline", movie.tagline)
+                        intent.putExtra("title", movie.original_title)
+                        intent.putExtra("overview", movie.overview)
+                        intent.putExtra("posterpath", movie.poster_path)
+                        intent.putExtra("releaseDate", movie.release_date)
+                        intent.putExtra("runtime", movie.runtime.toString())
 
-                    startActivity(intent)
+                        val solution = Math.round(movie.vote_average * 10.0) / 10.0
+                        intent.putExtra("rating", solution.toString())
+                        intent.putExtra("tagline", movie.tagline)
 
-                }
+                        startActivity(intent)
+                    }
+                })
+
+
+//                recyclerView.setOnItemClickListener(){ parent, view, position, id ->
+//                    val movie = parent.adapter.getItem(position) as Movie
+//
+//                    intent = Intent(this@MainActivity, MoviesActivity::class.java)
+//                    intent.putExtra("title", movie.original_title)
+//                    intent.putExtra("overview", movie.overview)
+//                    intent.putExtra("posterpath", movie.poster_path)
+//                    intent.putExtra("releaseDate", movie.release_date)
+//                    intent.putExtra("runtime", movie.runtime.toString())
+//
+//                    val solution = Math.round(movie.vote_average * 10.0) / 10.0
+//                    intent.putExtra("rating", solution.toString())
+//                    intent.putExtra("tagline", movie.tagline)
+//
+//                    startActivity(intent)
+//
+//                }
 
             }
 
